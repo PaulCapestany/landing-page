@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitiq - Detox your data diet from Big Tech™</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #7B68EE;
+            --primary-light: #9370DB;
+            --secondary: #0072ff;
+            --dark: #1a1a1a;
+            --darker: #121212;
+            --light: #f5f5f5;
+            --mid: #757575;
+            --border-radius: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: var(--light);
+            background: var(--darker);
+            overflow-x: hidden;
+        }
+
+        /* Container */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            padding: 1.5rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            background-color: rgba(18, 18, 18, 0.98);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            transition: var(--transition);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        header.scrolled {
+            padding: 1rem 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Logo */
+        .logo {
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: var(--light);
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+
+        /* Navigation */
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 2rem;
+        }
+
+        nav ul li a {
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        nav ul li a:hover {
+            color: var(--primary);
+        }
+
+        /* Mobile menu button */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--light);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        /* Hero section */
+        .hero {
+            padding: 180px 0 100px 0;
+            background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background-image: radial-gradient(circle at 30% 50%, rgba(123, 104, 238, 0.05) 0%, transparent 50%), 
+                            radial-gradient(circle at 70% 20%, rgba(123, 104, 238, 0.08) 0%, transparent 50%);
+            z-index: 1;
+        }
+
+        .hero-grid-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(26, 26, 26, 0.8) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(26, 26, 26, 0.8) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 1;
+        }
+
+        .hero-container {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            line-height: 1.2; /* Increased from 1.1 to provide more space for descenders */
+            padding-bottom: 0.1em; /* Added padding to ensure descenders are fully visible */
+            background: linear-gradient(90deg, #fff 0%, #e0e0e0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .hero h1 span {
+            color: var(--primary);
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            max-width: 700px;
+            margin: 0 auto 2.5rem auto;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Hero button container */
+        .hero-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: var(--light);
+            box-shadow: 0 4px 15px rgba(123, 104, 238, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(123, 104, 238, 0.4);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--light);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        /* Hero comparison */
+        .hero-graphic {
+            margin-top: 4rem;
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: 0 20px 80px rgba(0, 0, 0, 0.3);
+            background: var(--dark);
+        }
+
+        .hero-graphic-inner {
+            position: relative;
+            width: 100%;
+            background: linear-gradient(135deg, var(--dark) 0%, #2a2a2a 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .hero-graphic-inner::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(circle at 10% 90%, rgba(123, 104, 238, 0.1) 0%, transparent 30%),
+                            radial-gradient(circle at 90% 10%, rgba(0, 114, 255, 0.1) 0%, transparent 30%);
+            z-index: 1;
+        }
+
+        .hero-graphic-content {
+            width: 100%;
+            padding: 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .comparison-container {
+            display: flex;
+            width: 100%;
+            overflow: hidden;
+            border-radius: var(--border-radius);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .comparison-side {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 2rem;
+        }
+        
+        .comparison-left {
+            background-color: rgba(0, 0, 0, 0.3);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .comparison-right {
+            background: linear-gradient(135deg, rgba(123, 104, 238, 0.08) 0%, rgba(123, 104, 238, 0.15) 100%);
+        }
+        
+        .comparison-divider {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            width: 80px;
+        }
+        
+        .vs-badge {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 15px rgba(123, 104, 238, 0.3);
+        }
+        
+        .comparison-header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .comparison-header h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .comparison-right .comparison-header h3 {
+            color: var(--primary);
+        }
+        
+        .comparison-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .comparison-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .comparison-list {
+            list-style: none;
+            padding-left: 0;
+            width: 100%;
+        }
+        
+        .comparison-list {
+            list-style: none;
+            padding-left: 0;
+            width: 100%;
+        }
+        
+        .comparison-list li {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: flex-start;
+            font-size: 1rem;
+        }
+        
+        .comparison-list li:before {
+            margin-right: 0.5rem;
+            font-weight: bold;
+            line-height: 1.6;
+            flex-shrink: 0;
+        }
+        
+        .comparison-left .comparison-list li:before {
+            content: "✘";
+            color: #ff4d4d;
+        }
+        
+        .comparison-right .comparison-list li:before {
+            content: "✓";
+            color: var(--primary);
+        }
+
+        /* Features Section */
+        .features {
+            padding: 100px 0;
+            background-color: var(--dark);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            transition: var(--transition);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            background-color: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card p {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-card a {
+            display: inline-flex;
+            align-items: center;
+            color: var(--primary);
+            font-weight: 500;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .feature-card a:hover {
+            color: var(--primary-light);
+        }
+
+        .feature-link-icon {
+            margin-left: 0.5rem;
+            font-size: 1rem;
+        }
+
+        /* How It Works Section */
+        .how-it-works {
+            padding: 100px 0;
+            background-color: var(--darker);
+        }
+
+        .steps {
+            margin-top: 4rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .step {
+            position: relative;
+            padding: 0 1.5rem;
+        }
+
+        .step-number {
+            position: relative;
+            width: 60px;
+            height: 60px;
+            background: rgba(123, 104, 238, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 15px rgba(123, 104, 238, 0.15);
+        }
+
+        .step h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .step p {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Vision Section */
+        .vision-principles {
+            margin-top: 4rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .principle {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            transition: var(--transition);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .principle:hover {
+            transform: translateY(-5px);
+            background-color: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .principle-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+        }
+
+        .principle h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .principle p {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* CTA Section */
+        .cta {
+            padding: 100px 0;
+            background: linear-gradient(135deg, #1a1a1a 0%, #121212 100%);
+            position: relative;
+            text-align: center;
+        }
+
+        .cta::before {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background-image: radial-gradient(circle at 10% 30%, rgba(123, 104, 238, 0.05) 0%, transparent 50%), 
+                            radial-gradient(circle at 90% 70%, rgba(123, 104, 238, 0.08) 0%, transparent 50%);
+            z-index: 1;
+        }
+
+        .cta .container {
+            position: relative;
+            z-index: 2;
+        }
+
+        .cta h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        .cta p {
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto 2.5rem auto;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            padding: 4rem 0 2rem 0;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--light);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .footer-logo .logo-icon {
+            margin-right: 0.5rem;
+        }
+
+        .footer-description {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 1.5rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: var(--light);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .social-link:hover {
+            background-color: var(--primary);
+            color: var(--darker);
+            transform: translateY(-2px);
+        }
+
+        .footer-nav h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-nav ul {
+            list-style: none;
+        }
+
+        .footer-nav ul li {
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-nav ul li a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-nav ul li a:hover {
+            color: var(--primary);
+        }
+
+        .footer-bottom {
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+        }
+
+        /* Web of Trust diagram */
+        .diagram-container {
+            margin: 3rem auto;
+            text-align: center;
+            max-width: 900px;
+            position: relative;
+        }
+
+        .wot-diagram {
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            border-radius: var(--border-radius);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Responsive Design - Improved */
+        @media (max-width: 992px) {
+            .hero h1 {
+                font-size: 3rem;
+                line-height: 1.2;
+            }
+            
+            .hero-graphic {
+                height: auto;
+                margin-top: 3rem;
+            }
+            
+            .feature-card, .principle {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 1rem 0;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            nav {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                width: 100%;
+                height: 0;
+                background-color: var(--darker);
+                overflow: hidden;
+                transition: var(--transition);
+                z-index: 99;
+            }
+            
+            nav.active {
+                height: auto;
+                padding: 1.5rem 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            }
+            
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            nav ul li {
+                margin: 1rem 0;
+            }
+            
+            nav ul li a {
+                padding: 8px 0;
+                display: block;
+            }
+            
+            .hero {
+                padding: 120px 0 60px 0;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+                line-height: 1.3;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+                margin-bottom: 2rem;
+            }
+            
+            /* Fix for buttons on mobile */
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 280px;
+                margin: 0;
+                text-align: center;
+            }
+            
+            .comparison-container {
+                flex-direction: column;
+            }
+            
+            .comparison-divider {
+                width: 100%;
+                height: 60px;
+                margin: 10px 0;
+            }
+            
+            .comparison-side {
+                padding: 1.5rem;
+            }
+            
+            /* Increase text size in comparison boxes */
+            .comparison-list li {
+                font-size: 1.15rem;
+                margin-bottom: 1.2rem;
+            }
+            
+            .comparison-header h3 {
+                font-size: 1.7rem;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
+                
+            .features-grid,
+            .vision-principles,
+            .steps {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .social-links {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 576px) {
+            header .logo {
+                font-size: 1.5rem;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+                line-height: 1.3;
+            }
+            
+            .section-header h2 {
+                font-size: 1.7rem;
+            }
+            
+            .feature-card, .principle {
+                padding: 1.25rem;
+            }
+            
+            .feature-card h3, .principle h3 {
+                font-size: 1.3rem;
+            }
+            
+            .btn {
+                padding: 0.75rem 1.5rem;
+                width: 100%;
+                max-width: 280px;
+                text-align: center;
+            }
+            
+            .comparison-list li {
+                font-size: 0.95rem;
+                margin-bottom: 1.3rem;
+            }
+            
+            .comparison-header h3 {
+                font-size: 1.8rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            .features, .how-it-works, .cta {
+                padding: 60px 0;
+            }
+            
+            .section-header {
+                margin-bottom: 2.5rem;
+            }
+        }
+        
+        /* Additional touch improvements */
+        @media (hover: none) {
+            /* Make clickable elements more tap-friendly */
+            .feature-card a, 
+            .footer-nav ul li a,
+            nav ul li a {
+                padding: 8px 0;
+                display: inline-block;
+            }
+            
+            /* Prevent hover effects that might seem stuck on touch */
+            .feature-card:hover,
+            .principle:hover,
+            .btn:hover {
+                transform: none;
+            }
+        }
+        
+        /* Fix for very small screens */
+        @media (max-width: 360px) {
+            .container {
+                padding: 0 15px;
+            }
+            
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+            
+            .hero-graphic {
+                margin-top: 2rem;
+            }
+            
+            /* Optimize button size for very small screens */
+            .btn {
+                padding: 0.7rem 1rem;
+                font-size: 0.95rem;
+            }
+        }
+
+        /* Utility Classes */
+        .text-primary {
+            color: var(--primary);
+        }
+
+        .section-header p a {
+            color: var(--secondary); /* Uses the blue secondary color variable */
+        }         
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header id="header">
+        <div class="container header-container">
+            <a href="#" class="logo">
+                <span class="logo-icon">⚡</span>
+                bitiq
+            </a>
+            <button class="mobile-menu-btn" id="mobile-menu-btn">☰</button>
+            <nav id="nav">
+                <ul>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#how-it-works">How It Works</a></li>
+                    <li><a href="manifesto.html">Manifesto</a></li>
+                    <li><a href="https://github.com/bitiq-io" target="_blank">GitHub</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="hero-grid-bg"></div>
+        <div class="container hero-container">
+            <h1>Detox your <span>data diet</span> from Big Tech™</h1>
+            <p>bitiq is a new type of search engine powered by a verifiable Web-of-Trust (and some snazzy AI), designed explicitly to empower individuals rather than to maximize corporate profits.</p>
+            <div class="hero-buttons">
+                <a href="manifesto.html" class="btn btn-primary">Read Our Manifesto</a>
+            </div>
+            <div class="hero-graphic">
+                <div class="hero-graphic-inner">
+                    <div class="hero-graphic-content">
+                        <div class="comparison-container">
+                            <div class="comparison-side comparison-left">
+                                <div class="comparison-header">
+                                    <h3>Big Tech™ Approach</h3>
+                                </div>
+                                <div class="comparison-content">
+                                    <div class="comparison-icon">🔒</div>
+                                    <ul class="comparison-list">
+                                        <li>Opaque algorithmic control</li>
+                                        <li>Centralized data control</li>
+                                        <li>Surveillance-driven profits</li>
+                                        <li>Addictive engagement model</li>
+                                        <li>You are the product being sold</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="comparison-divider">
+                                <div class="vs-badge">VS</div>
+                            </div>
+                            <div class="comparison-side comparison-right">
+                                <div class="comparison-header">
+                                    <h3>bitiq Approach</h3>
+                                </div>
+                                <div class="comparison-content">
+                                    <div class="comparison-icon">🔓</div>
+                                    <ul class="comparison-list">
+                                        <li>Transparent, auditable algorithms</li>
+                                        <li>User-controlled data & networks</li>
+                                        <li>Open-source & community-driven</li>
+                                        <li>Truth & relevance prioritized</li>
+                                        <li>You own your digital experience</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header">
+                <h2>What Problem Does <span class="text-primary">bitiq</span> Solve?</h2>
+                <p>Today's digital world lacks effective accountability mechanisms, enabling misinformation and low-quality content to thrive unchecked. We've unknowingly surrendered control over our digital experiences to algorithms designed to maximize clicks and engagement, not truth or quality. bitiq fixes this.</p>
+            </div>           
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">👥</div>
+                    <h3>For Users & Developers</h3>
+                    <p>Use our upcoming web interface, or create custom apps or services with our comprehensive API to tailor bitiq to your specific needs.</p>
+                </div>                 
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3>AI-Enhanced Search</h3>
+                    <p>Advanced open-source LLMs help provide additional context and semantics to deliver more accurate and relevant results.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🕸️</div>
+                    <h3>Web-of-Trust Integration</h3>
+                    <p>Results are ranked based on your personal web of trust, ensuring you see content from sources your network deems reliable and trustworthy.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">☁️</div>
+                    <h3>Smart Architecture</h3>
+                    <p>With our Kubernetes-ready microservices architecture and use of best practices across the stack, bitiq is built for scale.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🚀</div>
+                    <h3>Real-Time Indexing</h3>
+                    <p>Stay up-to-date with the latest content through our efficient real-time Couchbase FTS and vector embeddings indexing system.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🌐</div>
+                    <h3>Open-Source</h3>
+                    <p>Open-source software built by the community, for the community. Contribute, fork, and help shape the future of information search.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <div class="section-header">
+                <h2>How <span class="text-primary">bitiq</span> Works</h2>
+                <p>Unlike typical tech platforms driven by opaque algorithms that prioritize engagement and profit, bitiq empowers users by establishing relevance rankings through a <a href="https://en.wikipedia.org/wiki/Web_of_trust" target="_blank">Web-of-Trust</a> consisting of secure <a href="https://nostr.com/" target="_blank">open-protocol identities</a>, along with auditable algorithms and AI.</p>
+                
+                <div class="diagram-container">
+                    <img src="images/web-of-trust-diagram.png" alt="Web-of-Trust Information Filtering Diagram" class="wot-diagram">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta" id="cta">
+        <div class="container">
+            <h2>Join Us in Reclaiming <span class="text-primary">Digital Autonomy</span></h2>
+            <p>Together, we can reclaim our digital autonomy. Whether you want to help in some way, or whether you're simply exploring—we hope you join us in creating a healthier, more trustworthy online world.</p>
+            <div class="cta-buttons">
+                <a href="manifesto.html" class="btn btn-primary">Read Our Manifesto</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div>
+                    <a href="#" class="footer-logo">
+                        <span class="logo-icon">⚡</span>
+                        bitiq
+                    </a>
+                    <p class="footer-description">bitiq is a new type of search engine powered by a verifiable Web-of-Trust (and some snazzy AI), designed explicitly to empower individuals rather than to maximize corporate profits.</p>
+                </div>
+                <div class="footer-nav">
+                    <h4>Overview</h4>
+                    <ul>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#how-it-works">How It Works</a></li>
+                    </ul>
+                </div>
+                <div class="footer-nav">
+                    <h4>Community</h4>
+                    <ul>
+                        <li><a href="https://github.com/bitiq-io" target="_blank">GitHub (coming soon!)</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 bitiq Inc. All rights reserved. Released under the MIT License.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Header scroll effect
+        const header = document.getElementById('header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const nav = document.getElementById('nav');
+        mobileMenuBtn.addEventListener('click', () => {
+            nav.classList.toggle('active');
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    window.scrollTo({
+                        top: target.offsetTop - 70,
+                        behavior: 'smooth'
+                    });
+                    // Close mobile menu if open
+                    nav.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>bitiq Manifesto - Reclaiming Digital Autonomy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #7B68EE;
+            --primary-light: #9370DB;
+            --secondary: #0072ff;
+            --dark: #1a1a1a;
+            --darker: #121212;
+            --light: #f5f5f5;
+            --mid: #757575;
+            --border-radius: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: var(--light);
+            background: var(--darker);
+            overflow-x: hidden;
+        }
+
+        /* Container */
+        .container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            padding: 1.5rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            background-color: rgba(18, 18, 18, 0.98);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            transition: var(--transition);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        header.scrolled {
+            padding: 1rem 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Logo */
+        .logo {
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: var(--light);
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+
+        /* Navigation */
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 2rem;
+        }
+
+        nav ul li a {
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        nav ul li a:hover {
+            color: var(--primary);
+        }
+
+        /* Mobile menu button */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--light);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Content Styles */
+        .manifesto-content {
+            padding: 140px 0 100px;
+        }
+
+        .manifesto-header {
+            margin-bottom: 50px;
+            text-align: center;
+        }
+
+        .manifesto-header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .manifesto-header p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-style: italic;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .manifesto-section {
+            margin-bottom: 50px;
+        }
+
+        .manifesto-section h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--primary-light);
+        }
+
+        .manifesto-section h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 30px 0 15px;
+        }
+
+        .manifesto-section p {
+            margin-bottom: 20px;
+            font-size: 1.05rem;
+        }
+
+        .manifesto-section ul, .manifesto-section ol {
+            margin: 20px 0 20px 20px;
+        }
+
+        .manifesto-section li {
+            margin-bottom: 10px;
+        }
+
+        .manifesto-section strong {
+            color: var(--primary-light);
+        }
+
+        .manifesto-quote {
+            border-left: 4px solid var(--primary);
+            padding-left: 20px;
+            margin: 30px 0;
+            font-style: italic;
+        }
+
+        .declaration {
+            background-color: rgba(123, 104, 238, 0.1);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin: 30px 0;
+        }
+
+        .declaration p {
+            font-weight: 600;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+
+        .call-to-action {
+            text-align: center;
+            margin: 70px 0 40px;
+        }
+
+        .call-to-action h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: var(--transition);
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: var(--light);
+            box-shadow: 0 4px 15px rgba(123, 104, 238, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(123, 104, 238, 0.4);
+        }
+
+        /* Footer */
+        footer {
+            padding: 30px 0;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            header {
+                padding: 1rem 0;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            nav {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                width: 100%;
+                height: 0;
+                background-color: var(--darker);
+                overflow: hidden;
+                transition: var(--transition);
+                z-index: 99;
+            }
+            
+            nav.active {
+                height: auto;
+                padding: 2rem 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            }
+            
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            nav ul li {
+                margin: 1rem 0;
+            }
+            
+            .manifesto-header h1 {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .manifesto-header h1 {
+                font-size: 2rem;
+            }
+            
+            .manifesto-section h2 {
+                font-size: 1.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header id="header">
+        <div class="container header-container">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">⚡</span>
+                bitiq
+            </a>
+            <button class="mobile-menu-btn" id="mobile-menu-btn">☰</button>
+            <nav id="nav">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="index.html#features">Features</a></li>
+                    <li><a href="index.html#how-it-works">How It Works</a></li>
+                    <li><a href="https://github.com/bitiq-io" target="_blank">GitHub</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Manifesto Content -->
+    <section class="manifesto-content">
+        <div class="container">
+            <div class="manifesto-header">
+                <h1>The bitiq Manifesto</h1>
+                <p>Information wants to be free, but truth demands verification.</p>
+            </div>
+
+            <div class="manifesto-section">
+                <p>We stand at the precipice of a digital revolution. The tools that promised to liberate have become instruments of control. The platforms that connected us now divide us. The algorithms that served us now enslave us. In a world where trust has been outsourced and verification abandoned, we reclaim both.</p>
+            </div>
+
+            <div class="manifesto-section">
+                <h2>The Digital Reality We Face</h2>
+                <p>Today's internet landscape is characterized by:</p>
+                <ul>
+                    <li><strong>National firewalls</strong> that restrict information flow, with more countries adopting these barriers each year</li>
+                    <li><strong>Corporate control</strong> where content creators face sudden demonetization or censorship by platform owners</li>
+                    <li><strong>Algorithmic manipulation</strong> that prioritizes engagement over truth</li>
+                    <li><strong>Bot-driven discourse</strong> flooding online spaces with artificial content that shapes public opinion</li>
+                    <li><strong>Blind trust systems</strong> with no real accountability or audit trail for who is saying what</li>
+                </ul>
+                <p>The result is a digital environment where reality itself becomes malleable, not by consensus, but by those who control the infrastructure.</p>
+            </div>
+
+            <div class="manifesto-section">
+                <h2>Our Declaration of Informational Sovereignty</h2>
+                
+                <div class="declaration">
+                    <p>Our data and attention are not to be manipulated or exploited.</p>
+                </div>
+                <div class="declaration">
+                    <p>Trust must be earned through verifiable actions, not granted by opaque authorities.</p>
+                </div>
+                <div class="declaration">
+                    <p>Algorithms must serve our own best self-interest, not corporate or state interests.</p>
+                </div>
+                <div class="declaration">
+                    <p>Transparency is non-negotiable in systems that shape our perception of truth.</p>
+                </div>
+                <div class="declaration">
+                    <p>We reject the premise that centralized control leads to better outcomes.</p>
+                </div>
+                <div class="declaration">
+                    <p>We reject the false choice between convenience and sovereignty.</p>
+                </div>
+                <div class="declaration">
+                    <p>We reject the notion that personal data protection is obsolete.</p>
+                </div>
+            </div>
+
+            <div class="manifesto-section">
+                <h2>Our Vision: A Transparent Web-of-Trust</h2>
+                <p>We envision a world where:</p>
+                <ol>
+                    <li>Every person defines their own web of trusted sources</li>
+                    <li>Relationships, not corporations, filter information</li>
+                    <li>AI serves human autonomy instead of undermining it</li>
+                    <li>Open protocols enable individual data ownership</li>
+                    <li>Ranking algorithms are transparent and user-controlled</li>
+                    <li>Information provenance is securely verifiable</li>
+                </ol>
+                <p>This is not utopian thinking—it is digital reality applied to information discovery, and it's actually finally technically achievable.</p>
+            </div>
+
+            <div class="manifesto-section">
+                <h2>How bitiq Helps Create This Future</h2>
+                
+                <h3>Global Information Visibility</h3>
+                <p>Today's online communications are fragmented across isolated platforms and networks. bitiq connects to multiple sources to provide comprehensive views of digital interactions, enabling users to see what might otherwise be hidden or filtered away.</p>
+                
+                <h3>Verified Digital Identity</h3>
+                <p>Your digital relationships should be as authentic as your physical ones. With bitiq, identity is verifiable. Trust is explicit, not implied. Reputation is earned, not assigned.</p>
+                
+                <h3>Advanced Web-of-Trust Filtering</h3>
+                <p>Unlike traditional systems where trust is centrally determined, bitiq lets you build a personal web of trusted connections. Information flows through this network, allowing credibility to be established through relationships rather than corporate gatekeepers.</p>
+                
+                <h3>Transparent Algorithms</h3>
+                <p>Code is speech. Algorithms are arguments. Arguments should be examinable.</p>
+                <p>Every ranking decision in bitiq is auditable. Every recommendation is explainable. There are no black boxes, no proprietary secrets hiding manipulation.</p>
+                
+                <h3>AI as Amplifier, Not Master</h3>
+                <p>We use artificial intelligence to extend human capability, not replace human judgment. Our AI tools amplify your ability to find signal in noise, operating with parameters you control, understand, and can modify.</p>
+                
+                <h3>Protocol, Not Platform</h3>
+                <p>Protocols survive where platforms die. Protocols resist capture where platforms inevitably submit. bitiq builds on open protocols, creating an ecosystem resistant to centralized control.</p>
+            </div>
+
+            <div class="manifesto-section">
+                <h2>The Path Forward</h2>
+                <p>We recognize that solving these challenges requires both technological innovation and community adoption:</p>
+                <ul>
+                    <li><strong>To address visibility issues</strong>, we unify communication sources for comprehensive, global visibility</li>
+                    <li><strong>To combat information manipulation</strong>, we provide transparency into how content is ranked and filtered</li>
+                    <li><strong>To mitigate spam and low-quality content</strong>, we use advanced reputation systems based on your Web-of-Trust</li>
+                    <li><strong>To enable verification</strong>, we employ robust, privacy-respecting identity systems</li>
+                </ul>
+            </div>
+
+            <div class="manifesto-section">
+                <h2>The Call to Action</h2>
+                <p>bitiq is more than technology—it is a declaration of informational independence. It is code as resistance against digital feudalism. It is the application of verification principles to the problem of knowledge discovery.</p>
+                
+                <p>We call on developers to contribute code.<br>
+                We call on creators to share content through open protocols.<br>
+                We call on users to build their webs of trust.<br>
+                We call on all who value truth to join in building an information ecosystem worthy of a free society.</p>
+                                
+                <p>Together, we reclaim the promise of the internet.</p>
+            </div>
+
+            <div class="call-to-action">
+                <h2>Join Us in Building a Better Digital Future</h2>
+                <a href="https://github.com/bitiq-io" target="_blank" class="btn btn-primary">Help build bitiq</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 bitiq Inc. All rights reserved. Released under the MIT License.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Header scroll effect
+        const header = document.getElementById('header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const nav = document.getElementById('nav');
+        mobileMenuBtn.addEventListener('click', () => {
+            nav.classList.toggle('active');
+        });
+    </script>
+</body>
+</html>
