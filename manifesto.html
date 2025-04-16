@@ -237,6 +237,36 @@
             border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
+        /* Footer Resources */
+        .footer-resources {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .footer-resources h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .footer-resources ul {
+            list-style: none;
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .footer-resources ul li a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-resources ul li a:hover {
+            color: var(--primary);
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             header {
@@ -277,6 +307,18 @@
             .manifesto-header h1 {
                 font-size: 2.5rem;
             }
+            
+            .footer-resources {
+                flex-direction: column;
+                align-items: center;
+                gap: 1.5rem;
+            }
+            
+            .footer-resources ul {
+                flex-direction: column;
+                gap: 0.75rem;
+                align-items: center;
+            }
         }
 
         @media (max-width: 576px) {
@@ -304,6 +346,7 @@
                     <li><a href="index.html">Home</a></li>
                     <li><a href="index.html#features">Features</a></li>
                     <li><a href="index.html#how-it-works">How It Works</a></li>
+                    <li><a href="https://youshouldread.substack.com/p/what-could-the-future-of-social-media">Interview</a></li>
                     <li><a href="https://github.com/bitiq-io" target="_blank">GitHub</a></li>
                 </ul>
             </nav>
@@ -431,6 +474,16 @@
     <!-- Footer -->
     <footer>
         <div class="container">
+            <div class="footer-resources">
+                <div>
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="https://youshouldread.substack.com/p/what-could-the-future-of-social-media" target="_blank">Interview: What could the future of social media look like?</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/Web_of_trust" target="_blank">Web of Trust</a></li>
+                        <li><a href="https://nostr.com/" target="_blank">Nostr Protocol</a></li>
+                    </ul>
+                </div>
+            </div>
             <p>&copy; 2025 bitiq Inc. All rights reserved. Released under the MIT License.</p>
         </div>
     </footer>
