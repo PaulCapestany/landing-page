@@ -42,7 +42,7 @@
         </div>
         <div>
           <label>Scheme</label>
-          <input id="scheme" value="neo4j+s" />
+          <input id="scheme" value="bolt+s" />
         </div>
       </div>
       <label>Cypher query</label>
@@ -65,7 +65,7 @@
         const host = $('host').value.trim();
         const user = $('user').value.trim();
         const pass = $('pass').value;
-        const scheme = $('scheme').value.trim() || 'neo4j+s';
+        const scheme = $('scheme').value.trim() || 'bolt+s';
         const uri = `${scheme}://${host}`;
 
         if(!host || !user || !pass){ return err('Please fill host, username, and password.'); }
@@ -119,7 +119,11 @@
           orb.controls.on();
         } catch (e) {
           console.error(e);
-          err(e.message || 'Connection or query failed. If this is a TLS error, use the relay approach.');
+          if (e.message && e.message.includes('No routing servers available')) {
+            err('Direct routing failed. Try using bolt+s (CA-signed) or bolt+ssc (self-signed) for Memgraph Cloud.');
+          } else {
+            err(e.message || 'Connection or query failed. If this is a TLS error, use the relay approach.');
+          }
         } finally {
           try { await session?.close(); } catch {}
           try { await driver?.close(); } catch {}
