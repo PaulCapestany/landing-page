@@ -56,12 +56,38 @@
   <footer class="muted">Credentials are used only in your browser session. Prefer a read-only role.</footer>
 
   <script>
+    const DEFAULT_RELAY_URL = 'https://mg-relay.onrender.com';
+
     const $ = (id) => document.getElementById(id);
-    const err = (m) => { const e=$('err'); e.textContent=m; e.classList.remove('hidden'); };
+    const err = (m) => {
+      const e = $('err');
+      if (!e) {
+        console.error('Error banner not found', m);
+        return;
+      }
+      e.textContent = m;
+      e.classList.remove('hidden');
+    };
+
+    const orbContainer = $('orb');
+    const runButton = $('run');
+
+    const hideError = () => {
+      const e = $('err');
+      if (e) {
+        e.classList.add('hidden');
+        e.textContent = '';
+      }
+    };
 
     const renderGraph = (data) => {
-      $('#orb').textContent = '';
-      const orb = new Orb.Orb($('#orb'), { nodeStyle: { label: { visible: true } } });
+      if (!orbContainer) {
+        console.error('Orb container not found');
+        err('Orb container missing from the page.');
+        return;
+      }
+      orbContainer.textContent = '';
+      const orb = new Orb.Orb(orbContainer, { nodeStyle: { label: { visible: true } } });
       orb.data.setup(data);
       orb.controls.on();
     };
@@ -103,10 +129,35 @@
       }
     };
 
+    const resolveRelayUrl = (provided) => {
+      if (provided?.trim()) {
+        return provided.trim();
+      }
+      if (DEFAULT_RELAY_URL) {
+        return DEFAULT_RELAY_URL;
+      }
+      const relay = prompt('Relay URL (https://relay.example.com)');
+      return relay ? relay.trim() : '';
+    };
+
+    const requestViaRelay = async (cypher, provided) => {
+      const relayUrl = resolveRelayUrl(provided);
+      if (!relayUrl) {
+        throw new Error('Relay URL is required.');
+      }
+      return fetchGraph(relayUrl, cypher);
+    };
+
     async function main() {
-      $('err').classList.add('hidden');
-      $('run').addEventListener('click', async () => {
-        $('err').classList.add('hidden');
+      if (!runButton) {
+        console.error('Run button missing from the page.');
+        return;
+      }
+
+      hideError();
+
+      runButton.addEventListener('click', async () => {
+        hideError();
 
         const host = $('host').value.trim();
         const user = $('user').value.trim();
@@ -123,24 +174,16 @@
             data = await runDirectQuery({ uri, user, pass, cypher });
           } catch (directError) {
             console.error('Direct connection failed', directError);
-            const relay = prompt('Relay URL (https://relay.example.com)');
-            if (!relay) {
-              return err('Relay URL is required.');
-            }
             try {
-              data = await fetchGraph(relay, cypher);
+              data = await requestViaRelay(cypher);
             } catch (relayError) {
               console.error('Relay request failed', relayError);
               return err(relayError.message || 'Relay request failed.');
             }
           }
         } else {
-          const relay = prompt('Relay URL (https://relay.example.com)');
-          if (!relay) {
-            return err('Relay URL is required.');
-          }
           try {
-            data = await fetchGraph(relay, cypher);
+            data = await requestViaRelay(cypher);
           } catch (relayError) {
             console.error('Relay request failed', relayError);
             return err(relayError.message || 'Relay request failed.');
