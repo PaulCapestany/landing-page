@@ -19,6 +19,7 @@
   </style>
   <script src="https://unpkg.com/neo4j-driver@5.25.0/lib/browser/neo4j-web.min.js"></script>
   <script src="https://unpkg.com/@memgraph/orb/dist/browser/orb.min.js"></script>
+  <script src="scripts/mg-relay.js"></script>
 </head>
 <body>
   <header><strong>bitiq graph (beta)</strong></header>
@@ -58,7 +59,52 @@
     const $ = (id) => document.getElementById(id);
     const err = (m) => { const e=$('err'); e.textContent=m; e.classList.remove('hidden'); };
 
+    const renderGraph = (data) => {
+      $('#orb').textContent = '';
+      const orb = new Orb.Orb($('#orb'), { nodeStyle: { label: { visible: true } } });
+      orb.data.setup(data);
+      orb.controls.on();
+    };
+
+    const runDirectQuery = async ({ uri, user, pass, cypher }) => {
+      let driver;
+      let session;
+      try {
+        driver = neo4j.driver(uri, neo4j.auth.basic(user, pass), { disableLosslessIntegers: true });
+        await driver.getServerInfo();
+
+        session = driver.session();
+        const res = await session.run(cypher);
+
+        const nodes = new Map();
+        const edges = [];
+        const getNode = (n) => {
+          const id = n.identity.toString();
+          if(!nodes.has(id)){
+            nodes.set(id, { id, label: Array.from(n.labels || []).join(','), data: n.properties || {} });
+          }
+          return nodes.get(id);
+        };
+
+        for (const r of res.records) {
+          for (const v of r.values()) {
+            if (v && typeof v === 'object' && v.start && v.end) {
+              edges.push({ id: v.identity.toString(), source: v.start.toString(), target: v.end.toString(), label: v.type, data: v.properties || {} });
+            } else if (v && v.labels) {
+              getNode(v);
+            }
+          }
+        }
+
+        return { nodes: Array.from(nodes.values()), edges };
+      } finally {
+        try { await session?.close(); } catch {}
+        try { await driver?.close(); } catch {}
+      }
+    };
+
     async function main() {
+      $('err').classList.add('hidden');
       $('run').addEventListener('click', async () => {
         $('err').classList.add('hidden');
 
@@ -66,67 +112,46 @@
         const user = $('user').value.trim();
         const pass = $('pass').value;
         const scheme = $('scheme').value.trim() || 'bolt+s';
-        const uri = `${scheme}://${host}`;
+        const cypher = $('cypher').value;
 
-        if(!host || !user || !pass){ return err('Please fill host, username, and password.'); }
+        const hasDirectCreds = host && user && pass;
+        let data;
 
-        let driver, session;
+        if (hasDirectCreds) {
+          const uri = `${scheme}://${host}`;
+          try {
+            data = await runDirectQuery({ uri, user, pass, cypher });
+          } catch (directError) {
+            console.error('Direct connection failed', directError);
+            const relay = prompt('Relay URL (https://relay.example.com)');
+            if (!relay) {
+              return err('Relay URL is required.');
+            }
+            try {
+              data = await fetchGraph(relay, cypher);
+            } catch (relayError) {
+              console.error('Relay request failed', relayError);
+              return err(relayError.message || 'Relay request failed.');
+            }
+          }
+        } else {
+          const relay = prompt('Relay URL (https://relay.example.com)');
+          if (!relay) {
+            return err('Relay URL is required.');
+          }
+          try {
+            data = await fetchGraph(relay, cypher);
+          } catch (relayError) {
+            console.error('Relay request failed', relayError);
+            return err(relayError.message || 'Relay request failed.');
+          }
+        }
+
         try {
-          // Create driver (browser build speaks Bolt over WebSockets)
-          driver = neo4j.driver(uri, neo4j.auth.basic(user, pass), { disableLosslessIntegers: true });
-          await driver.getServerInfo(); // verify TLS/connection early
-
-          session = driver.session();
-          const cypher = $('cypher').value;
-
-          const res = await session.run(cypher);
-          // Map records to Orb format
-          const nodes = new Map();
-          const edges = [];
-          const getNode = (n) => {
-            const id = n.identity.toString();
-            if(!nodes.has(id)){
-              nodes.set(id, { id, label: Array.from(n.labels || []).join(','), data: n.properties || {} });
-            }
-            return nodes.get(id);
-          };
-
-          for (const r of res.records) {
-            for (const v of r.values()) {
-              if (v && typeof v === 'object' && v.start && v.end) {
-                // relationship
-                const id = v.identity.toString();
-                const source = v.start.toString();
-                const target = v.end.toString();
-                edges.push({ id, source, target, label: v.type, data: v.properties || {} });
-              } else if (v && v.labels) {
-                // node
-                getNode(v);
-              }
-            }
-          }
-
-          const data = {
-            nodes: Array.from(nodes.values()),
-            edges
-          };
-
-          const orb = new Orb.Orb($('#orb'), {
-            // basic styling; tweak as needed
-            nodeStyle: { label: { visible: true } }
-          });
-          orb.data.setup(data);
-          orb.controls.on();
-        } catch (e) {
-          console.error(e);
-          if (e.message && e.message.includes('No routing servers available')) {
-            err('Direct routing failed. Try using bolt+s (CA-signed) or bolt+ssc (self-signed) for Memgraph Cloud.');
-          } else {
-            err(e.message || 'Connection or query failed. If this is a TLS error, use the relay approach.');
-          }
-        } finally {
-          try { await session?.close(); } catch {}
-          try { await driver?.close(); } catch {}
+          renderGraph(data);
+        } catch (renderError) {
+          console.error('Render failed', renderError);
+          err(renderError.message || 'Unable to render graph data.');
         }
       });
     }
