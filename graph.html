@@ -89,7 +89,9 @@
       orbContainer.textContent = '';
       const orb = new Orb.Orb(orbContainer, { nodeStyle: { label: { visible: true } } });
       orb.data.setup(data);
-      orb.controls.on();
+      if (orb?.controls && typeof orb.controls.on === 'function') {
+        orb.controls.on();
+      }
     };
 
     const runDirectQuery = async ({ uri, user, pass, cypher }) => {
