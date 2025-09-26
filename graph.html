@@ -11,7 +11,6 @@
     .card{background:#0f172a;border:1px solid #1f2937;border-radius:12px;padding:16px;max-width:980px;margin:0 auto}
     label{display:block;margin:8px 0 4px}
     input,button,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #374151;background:#0b1220;color:#e6edf3}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
     #orb{height:70vh;border-radius:12px;border:1px solid #1f2937;margin-top:16px}
     .muted{opacity:.8;font-size:12px}
     .error{color:#ff8a8a;margin-top:8px}
@@ -25,35 +24,15 @@
   <header><strong>bitiq graph (beta)</strong></header>
   <div class="wrap">
     <div class="card">
-      <p class="muted">For quick testing. Use a <em>read-only</em> Memgraph user.</p>
-      <div class="row">
-        <div>
-          <label>Host</label>
-          <input id="host" placeholder="your-cloud-host:7687" />
-        </div>
-        <div>
-          <label>Username</label>
-          <input id="user" placeholder="readonly" />
-        </div>
-      </div>
-      <div class="row">
-        <div>
-          <label>Password</label>
-          <input id="pass" type="password" placeholder="••••••••" />
-        </div>
-        <div>
-          <label>Scheme</label>
-          <input id="scheme" value="bolt+s" />
-        </div>
-      </div>
+      <p class="muted">Queries are executed through the hosted read-only relay. Adjust the Cypher below to explore the dataset.</p>
       <label>Cypher query</label>
       <textarea id="cypher" rows="3">MATCH (n)-[r]->(m) RETURN n,r,m LIMIT 200;</textarea>
-      <button id="run">Connect & Run</button>
+      <button id="run">Run query</button>
       <div id="err" class="error hidden"></div>
       <div id="orb"></div>
     </div>
   </div>
-  <footer class="muted">Credentials are used only in your browser session. Prefer a read-only role.</footer>
+  <footer class="muted">Powered by mg-relay (read-only). Update the query to explore different slices of the graph.</footer>
 
   <script>
     const DEFAULT_RELAY_URL = 'https://mg-relay.onrender.com';
@@ -147,53 +126,6 @@
       }
     };
 
-    const runDirectQuery = async ({ uri, user, pass, cypher }) => {
-      let driver;
-      let session;
-      try {
-        driver = neo4j.driver(uri, neo4j.auth.basic(user, pass), { disableLosslessIntegers: true });
-        await driver.getServerInfo();
-
-        session = driver.session();
-        const res = await session.run(cypher);
-
-        const nodes = new Map();
-        const edges = [];
-        const getNode = (n) => {
-          const id = n.identity.toString();
-          if(!nodes.has(id)){
-            nodes.set(id, { id, label: Array.from(n.labels || []).join(','), data: n.properties || {} });
-          }
-          return nodes.get(id);
-        };
-
-        for (const r of res.records) {
-          for (const v of r.values()) {
-            if (v && typeof v === 'object' && v.start && v.end) {
-              const start = v.start.toString();
-              const end = v.end.toString();
-              edges.push({
-                id: v.identity.toString(),
-                start,
-                end,
-                source: start,
-                target: end,
-                label: v.type,
-                data: v.properties || {}
-              });
-            } else if (v && v.labels) {
-              getNode(v);
-            }
-          }
-        }
-
-        return { nodes: Array.from(nodes.values()), edges };
-      } finally {
-        try { await session?.close(); } catch {}
-        try { await driver?.close(); } catch {}
-      }
-    };
-
     const resolveRelayUrl = (provided) => {
       if (provided?.trim()) {
         return provided.trim();
@@ -225,46 +157,25 @@
         console.log(`${logScope} run clicked`);
         hideError();
 
-        const host = $('host').value.trim();
-        const user = $('user').value.trim();
-        const pass = $('pass').value;
-        const scheme = $('scheme').value.trim() || 'bolt+s';
-        const cypher = $('cypher').value;
+        const cypher = $('cypher').value.trim();
+        if (!cypher) {
+          err('Please enter a Cypher query.');
+          return;
+        }
 
-        const hasDirectCreds = host && user && pass;
         let data;
-
-        if (hasDirectCreds) {
-          const uri = `${scheme}://${host}`;
-          console.log(`${logScope} attempting direct connection`, { uri, user });
-          try {
-            data = await runDirectQuery({ uri, user, pass, cypher });
-            console.log(`${logScope} direct connection succeeded`, { nodes: data.nodes.length, edges: data.edges.length });
-          } catch (directError) {
-            console.error('Direct connection failed', directError);
-            try {
-              console.log(`${logScope} falling back to relay`);
-              data = await requestViaRelay(cypher);
-              console.log(`${logScope} relay succeeded`, { nodes: data.nodes.length, edges: data.edges.length });
-            } catch (relayError) {
-              console.error('Relay request failed', relayError);
-              return err(relayError.message || 'Relay request failed.');
-            }
-          }
-        } else {
-          try {
-            console.log(`${logScope} using relay only path`);
-            data = await requestViaRelay(cypher);
-            console.log(`${logScope} relay succeeded`, { nodes: data.nodes.length, edges: data.edges.length });
-          } catch (relayError) {
-            console.error('Relay request failed', relayError);
-            return err(relayError.message || 'Relay request failed.');
-          }
+        try {
+          console.log(`${logScope} executing relay query`);
+          data = await requestViaRelay(cypher);
+          console.log(`${logScope} relay succeeded`, { nodes: data.nodes.length, edges: data.edges.length });
+        } catch (relayError) {
+          console.error('Relay request failed', relayError);
+          return err(relayError.message || 'Relay request failed.');
         }
 
         try {
           if (!data?.nodes?.length) {
-            console.warn(`${logScope} relay/direct response returned no nodes`, data);
+            console.warn(`${logScope} relay response returned no nodes`, data);
             err('Query returned no nodes. Adjust the Cypher query and try again.');
             return;
           }
