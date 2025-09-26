@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>bitiq graph (beta)</title>
+  <style>
+    body{font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial; margin:0; background:#0b0f14; color:#e6edf3}
+    header,footer{padding:12px 16px; background:#111827}
+    .wrap{padding:16px}
+    .card{background:#0f172a;border:1px solid #1f2937;border-radius:12px;padding:16px;max-width:980px;margin:0 auto}
+    label{display:block;margin:8px 0 4px}
+    input,button,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #374151;background:#0b1220;color:#e6edf3}
+    #orb{height:70vh;border-radius:12px;border:1px solid #1f2937;margin-top:16px}
+    .muted{opacity:.8;font-size:12px}
+    .error{color:#ff8a8a;margin-top:8px}
+    .hidden{display:none}
+  </style>
+  <script src="https://unpkg.com/neo4j-driver@5.25.0/lib/browser/neo4j-web.min.js"></script>
+  <script src="scripts/orb.min.js"></script>
+  <script src="scripts/mg-relay.js"></script>
+</head>
+<body>
+  <header><strong>bitiq graph (beta)</strong></header>
+  <div class="wrap">
+    <div class="card">
+      <p class="muted">Queries are executed through the hosted read-only relay. Adjust the Cypher below to explore the dataset.</p>
+      <label>Cypher query</label>
+      <textarea id="cypher" rows="3">MATCH (n)-[r]->(m) RETURN n,r,m LIMIT 200;</textarea>
+      <button id="run">Run query</button>
+      <div id="err" class="error hidden"></div>
+      <div id="orb"></div>
+    </div>
+  </div>
+  <footer class="muted">Powered by mg-relay (read-only). Update the query to explore different slices of the graph.</footer>
+
+  <script>
+    const DEFAULT_RELAY_URL = 'https://mg-relay.onrender.com';
+
+    const $ = (id) => document.getElementById(id);
+    const logScope = '[graph]';
+    console.log(`${logScope} script loaded`);
+
+    const err = (m) => {
+      const e = $('err');
+      if (!e) {
+        console.error('Error banner not found', m);
+        return;
+      }
+      e.textContent = m;
+      e.classList.remove('hidden');
+    };
+
+    const orbContainer = $('orb');
+    const runButton = $('run');
+
+    const hideError = () => {
+      const e = $('err');
+      if (e) {
+        e.classList.add('hidden');
+        e.textContent = '';
+      }
+    };
+
+    const normalizeGraphData = (raw) => {
+      const nodes = Array.isArray(raw?.nodes)
+        ? raw.nodes
+            .map((node) => {
+              const id = node?.id?.toString?.() ?? (node?.id !== undefined ? `${node.id}` : '');
+              if (!id) { return null; }
+              return {
+                ...node,
+                id,
+              };
+            })
+            .filter(Boolean)
+        : [];
+
+      const edges = Array.isArray(raw?.edges)
+        ? raw.edges
+            .map((edge) => {
+              const startRaw = edge?.start ?? edge?.source;
+              const endRaw = edge?.end ?? edge?.target;
+              if (startRaw == null || endRaw == null) {
+                return null;
+              }
+              const start = startRaw.toString();
+              const end = endRaw.toString();
+              const id = edge?.id?.toString?.() ?? edge?.id ?? `${start}-${end}`;
+              return {
+                ...edge,
+                id: id.toString(),
+                start,
+                end,
+                source: edge?.source ?? start,
+                target: edge?.target ?? end,
+              };
+            })
+            .filter(Boolean)
+        : [];
+
+      return { nodes, edges };
+    };
+
+    const renderGraph = (data) => {
+      if (!orbContainer) {
+        console.error('Orb container not found');
+        err('Orb container missing from the page.');
+        return;
+      }
+      const normalized = normalizeGraphData(data);
+      orbContainer.textContent = '';
+      const orb = new Orb.Orb(orbContainer, { nodeStyle: { label: { visible: true } } });
+      orb.data.setup(normalized);
+      if (orb?.controls && typeof orb.controls.on === 'function') {
+        orb.controls.on();
+      }
+      if (orb?.view?.render) {
+        orb.view.render(() => {
+          try {
+            orb.view.recenter?.();
+          } catch (e) {
+            console.warn(`${logScope} recenter failed`, e);
+          }
+        });
+      }
+    };
+
+    const resolveRelayUrl = (provided) => {
+      if (provided?.trim()) {
+        return provided.trim();
+      }
+      if (DEFAULT_RELAY_URL) {
+        return DEFAULT_RELAY_URL;
+      }
+      const relay = prompt('Relay URL (https://relay.example.com)');
+      return relay ? relay.trim() : '';
+    };
+
+    const requestViaRelay = async (cypher, provided) => {
+      const relayUrl = resolveRelayUrl(provided);
+      if (!relayUrl) {
+        throw new Error('Relay URL is required.');
+      }
+      return fetchGraph(relayUrl, cypher);
+    };
+
+    async function main() {
+      if (!runButton) {
+        console.error('Run button missing from the page.');
+        return;
+      }
+
+      hideError();
+
+      runButton.addEventListener('click', async () => {
+        console.log(`${logScope} run clicked`);
+        hideError();
+
+        const cypher = $('cypher').value.trim();
+        if (!cypher) {
+          err('Please enter a Cypher query.');
+          return;
+        }
+
+        let data;
+        try {
+          console.log(`${logScope} executing relay query`);
+          data = await requestViaRelay(cypher);
+          console.log(`${logScope} relay succeeded`, { nodes: data.nodes.length, edges: data.edges.length });
+        } catch (relayError) {
+          console.error('Relay request failed', relayError);
+          return err(relayError.message || 'Relay request failed.');
+        }
+
+        try {
+          if (!data?.nodes?.length) {
+            console.warn(`${logScope} relay response returned no nodes`, data);
+            err('Query returned no nodes. Adjust the Cypher query and try again.');
+            return;
+          }
+          renderGraph(data);
+          console.log(`${logScope} render complete`);
+        } catch (renderError) {
+          console.error('Render failed', renderError);
+          err(renderError.message || 'Unable to render graph data.');
+        }
+      });
+    }
+    main();
+  </script>
+</body>
+</html>
