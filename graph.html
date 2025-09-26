@@ -26,7 +26,7 @@
     <div class="card">
       <p class="muted">Queries are executed through the hosted read-only relay. Adjust the Cypher below to explore the dataset.</p>
       <label>Cypher query</label>
-      <textarea id="cypher" rows="3">MATCH (n)-[r]->(m) RETURN n,r,m LIMIT 200;</textarea>
+      <textarea id="cypher" rows="3">MATCH (n)-[r]->(m) RETURN n,r,m;</textarea>
       <button id="run">Run query</button>
       <div id="err" class="error hidden"></div>
       <div id="orb"></div>
@@ -53,6 +53,7 @@
 
     const orbContainer = $('orb');
     const runButton = $('run');
+    let isRunning = false;
 
     const hideError = () => {
       const e = $('err');
@@ -145,6 +146,61 @@
       return fetchGraph(relayUrl, cypher);
     };
 
+    const setLoadingState = (loading) => {
+      if (!runButton) return;
+      runButton.disabled = loading;
+      runButton.textContent = loading ? 'Running...' : 'Run query';
+    };
+
+    const executeQuery = async (source = 'manual') => {
+      if (isRunning) {
+        console.log(`${logScope} query already running, skipping`, { source });
+        return;
+      }
+
+      isRunning = true;
+      setLoadingState(true);
+      hideError();
+
+      const cypher = $('cypher').value.trim();
+      if (!cypher) {
+        err('Please enter a Cypher query.');
+        isRunning = false;
+        setLoadingState(false);
+        return;
+      }
+
+      console.log(`${logScope} executing relay query`, { source });
+
+      let data;
+      try {
+        data = await requestViaRelay(cypher);
+        console.log(`${logScope} relay succeeded`, { nodes: data.nodes.length, edges: data.edges.length });
+      } catch (relayError) {
+        console.error('Relay request failed', relayError);
+        err(relayError.message || 'Relay request failed.');
+        isRunning = false;
+        setLoadingState(false);
+        return;
+      }
+
+      try {
+        if (!data?.nodes?.length) {
+          console.warn(`${logScope} relay response returned no nodes`, data);
+          err('Query returned no nodes. Adjust the Cypher query and try again.');
+          return;
+        }
+        renderGraph(data);
+        console.log(`${logScope} render complete`);
+      } catch (renderError) {
+        console.error('Render failed', renderError);
+        err(renderError.message || 'Unable to render graph data.');
+      } finally {
+        isRunning = false;
+        setLoadingState(false);
+      }
+    };
+
     async function main() {
       if (!runButton) {
         console.error('Run button missing from the page.');
@@ -153,39 +209,11 @@
 
       hideError();
 
-      runButton.addEventListener('click', async () => {
-        console.log(`${logScope} run clicked`);
-        hideError();
-
-        const cypher = $('cypher').value.trim();
-        if (!cypher) {
-          err('Please enter a Cypher query.');
-          return;
-        }
-
-        let data;
-        try {
-          console.log(`${logScope} executing relay query`);
-          data = await requestViaRelay(cypher);
-          console.log(`${logScope} relay succeeded`, { nodes: data.nodes.length, edges: data.edges.length });
-        } catch (relayError) {
-          console.error('Relay request failed', relayError);
-          return err(relayError.message || 'Relay request failed.');
-        }
-
-        try {
-          if (!data?.nodes?.length) {
-            console.warn(`${logScope} relay response returned no nodes`, data);
-            err('Query returned no nodes. Adjust the Cypher query and try again.');
-            return;
-          }
-          renderGraph(data);
-          console.log(`${logScope} render complete`);
-        } catch (renderError) {
-          console.error('Render failed', renderError);
-          err(renderError.message || 'Unable to render graph data.');
-        }
+      runButton.addEventListener('click', () => {
+        executeQuery('button');
       });
+
+      executeQuery('auto-load');
     }
     main();
   </script>
