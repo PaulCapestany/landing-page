@@ -59,6 +59,9 @@
     const DEFAULT_RELAY_URL = 'https://mg-relay.onrender.com';
 
     const $ = (id) => document.getElementById(id);
+    const logScope = '[graph]';
+    console.log(`${logScope} script loaded`);
+
     const err = (m) => {
       const e = $('err');
       if (!e) {
@@ -159,6 +162,7 @@
       hideError();
 
       runButton.addEventListener('click', async () => {
+        console.log(`${logScope} run clicked`);
         hideError();
 
         const host = $('host').value.trim();
@@ -172,12 +176,16 @@
 
         if (hasDirectCreds) {
           const uri = `${scheme}://${host}`;
+          console.log(`${logScope} attempting direct connection`, { uri, user });
           try {
             data = await runDirectQuery({ uri, user, pass, cypher });
+            console.log(`${logScope} direct connection succeeded`, { nodes: data.nodes.length, edges: data.edges.length });
           } catch (directError) {
             console.error('Direct connection failed', directError);
             try {
+              console.log(`${logScope} falling back to relay`);
               data = await requestViaRelay(cypher);
+              console.log(`${logScope} relay succeeded`, { nodes: data.nodes.length, edges: data.edges.length });
             } catch (relayError) {
               console.error('Relay request failed', relayError);
               return err(relayError.message || 'Relay request failed.');
@@ -185,7 +193,9 @@
           }
         } else {
           try {
+            console.log(`${logScope} using relay only path`);
             data = await requestViaRelay(cypher);
+            console.log(`${logScope} relay succeeded`, { nodes: data.nodes.length, edges: data.edges.length });
           } catch (relayError) {
             console.error('Relay request failed', relayError);
             return err(relayError.message || 'Relay request failed.');
@@ -193,7 +203,13 @@
         }
 
         try {
+          if (!data?.nodes?.length) {
+            console.warn(`${logScope} relay/direct response returned no nodes`, data);
+            err('Query returned no nodes. Adjust the Cypher query and try again.');
+            return;
+          }
           renderGraph(data);
+          console.log(`${logScope} render complete`);
         } catch (renderError) {
           console.error('Render failed', renderError);
           err(renderError.message || 'Unable to render graph data.');
