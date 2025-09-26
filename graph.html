@@ -83,15 +83,56 @@
       }
     };
 
+    const normalizeGraphData = (raw) => {
+      const nodes = Array.isArray(raw?.nodes)
+        ? raw.nodes
+            .map((node) => {
+              const id = node?.id?.toString?.() ?? (node?.id !== undefined ? `${node.id}` : '');
+              if (!id) { return null; }
+              return {
+                ...node,
+                id,
+              };
+            })
+            .filter(Boolean)
+        : [];
+
+      const edges = Array.isArray(raw?.edges)
+        ? raw.edges
+            .map((edge) => {
+              const startRaw = edge?.start ?? edge?.source;
+              const endRaw = edge?.end ?? edge?.target;
+              if (startRaw == null || endRaw == null) {
+                return null;
+              }
+              const start = startRaw.toString();
+              const end = endRaw.toString();
+              const id = edge?.id?.toString?.() ?? edge?.id ?? `${start}-${end}`;
+              return {
+                ...edge,
+                id: id.toString(),
+                start,
+                end,
+                source: edge?.source ?? start,
+                target: edge?.target ?? end,
+              };
+            })
+            .filter(Boolean)
+        : [];
+
+      return { nodes, edges };
+    };
+
     const renderGraph = (data) => {
       if (!orbContainer) {
         console.error('Orb container not found');
         err('Orb container missing from the page.');
         return;
       }
+      const normalized = normalizeGraphData(data);
       orbContainer.textContent = '';
       const orb = new Orb.Orb(orbContainer, { nodeStyle: { label: { visible: true } } });
-      orb.data.setup(data);
+      orb.data.setup(normalized);
       if (orb?.controls && typeof orb.controls.on === 'function') {
         orb.controls.on();
       }
@@ -129,7 +170,17 @@
         for (const r of res.records) {
           for (const v of r.values()) {
             if (v && typeof v === 'object' && v.start && v.end) {
-              edges.push({ id: v.identity.toString(), source: v.start.toString(), target: v.end.toString(), label: v.type, data: v.properties || {} });
+              const start = v.start.toString();
+              const end = v.end.toString();
+              edges.push({
+                id: v.identity.toString(),
+                start,
+                end,
+                source: start,
+                target: end,
+                label: v.type,
+                data: v.properties || {}
+              });
             } else if (v && v.labels) {
               getNode(v);
             }

@@ -30,7 +30,17 @@ app.post("/query", async (req, res) => {
     for (const rec of result.records) {
       for (const v of rec.values()) {
         if (v && typeof v === "object" && v.start && v.end) {
-          edges.push({ id: v.identity.toString(), source: v.start.toString(), target: v.end.toString(), label: v.type, data: v.properties || {} });
+          const start = v.start.toString();
+          const end = v.end.toString();
+          edges.push({
+            id: v.identity.toString(),
+            start,
+            end,
+            source: start,
+            target: end,
+            label: v.type,
+            data: v.properties || {}
+          });
         } else if (v && v.labels) {
           nodeOf(v);
         }
