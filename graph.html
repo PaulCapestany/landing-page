@@ -95,6 +95,15 @@
       if (orb?.controls && typeof orb.controls.on === 'function') {
         orb.controls.on();
       }
+      if (orb?.view?.render) {
+        orb.view.render(() => {
+          try {
+            orb.view.recenter?.();
+          } catch (e) {
+            console.warn(`${logScope} recenter failed`, e);
+          }
+        });
+      }
     };
 
     const runDirectQuery = async ({ uri, user, pass, cypher }) => {
